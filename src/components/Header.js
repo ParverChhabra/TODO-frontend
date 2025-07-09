@@ -20,11 +20,11 @@ import React from 'react';
 
 function Header() {
   return (
-    <header className="bg-blue-600 p-6 text-center shadow-md">
+    <header className="bg-orange-500 p-6  text-center shadow-md">
       <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-wide">
         Todo App
       </h1>
-      <p className="text-lg text-blue-100">
+      <p className="text-lg text-white">
         Manage your tasks efficiently
       </p>
     </header>

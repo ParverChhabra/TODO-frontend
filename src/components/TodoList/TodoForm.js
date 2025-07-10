@@ -48,6 +48,8 @@
 
 import React, { useState } from 'react';
 
+const apiUrl = process.env.REACT_APP_API_URL;
+
 function TodoForm({ onTodoCreated }) {
   const [form, setForm] = useState({ title: '', description: '' });
 
@@ -57,7 +59,7 @@ function TodoForm({ onTodoCreated }) {
 
   const handleSubmit = e => {
     e.preventDefault();
-    fetch('http://localhost:3000/api/todos', {
+    fetch('${apiUrl}/api/todos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form)

@@ -204,7 +204,9 @@
 import React, { useState, useEffect } from "react";
 import TodoItem from "./TodoItem";
 import TodoForm from "./TodoForm";
-import { FaFilter, FaCheckCircle, FaRegCircle } from "react-icons/fa";
+import { FaFilter } from "react-icons/fa";
+
+const apiUrl = process.env.REACT_APP_API_URL;
 
 function TodoList() {
   const [todos, setTodos] = useState([]);
@@ -212,41 +214,36 @@ function TodoList() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("DESC");
-  const [statusFilter, setStatusFilter] = useState("all"); // 'all' | 'done' | 'not_done'
+  const [statusFilter, setStatusFilter] = useState("all");
   const [showFilterMenu, setShowFilterMenu] = useState(false);
 
-
-  const handleSearch=(value)=>{
-    setSearch(value)
-    const params={
-      search:value,
-    }
-    console.log(params)
-    
-    fetch(`http://localhost:3000/api/todos?search=${value}`)
+  const handleSearch = (value) => {
+    setSearch(value);
+    setLoading(true);
+    fetch(`${apiUrl}/api/todos?search=${value}`)
       .then((res) => res.json())
       .then((data) => {
         setTodos(data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }
+  };
+
   useEffect(() => {
     setLoading(true);
     const params = new URLSearchParams();
     if (search) params.append("search", search);
     if (sortBy) params.append("sortBy", sortBy);
     if (sortOrder) params.append("sortOrder", sortOrder);
-    console.log(params)
 
-    fetch(`http://localhost:3000/api/todos?${params.toString()}`)
+    fetch(`${apiUrl}/api/todos?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         setTodos(data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [sortBy, sortOrder]);
+  }, [sortBy, sortOrder, search]);
 
   const handleTodoCreated = (newTodo) => {
     setTodos((prev) => [newTodo, ...prev]);
@@ -254,7 +251,7 @@ function TodoList() {
 
   const handleToggleStatus = (id, currentStatus) => {
     const newStatus = currentStatus === "Todo" ? "Done" : "Todo";
-    fetch(`http://localhost:3000/api/todos/${id}`, {
+    fetch(`${apiUrl}/api/todos/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus }),
@@ -278,7 +275,7 @@ function TodoList() {
 
   const handleDeleteTodo = (id) => {
     if (window.confirm("Are you sure you want to delete this todo?")) {
-      fetch(`http://localhost:3000/api/todos/${id}`, {
+      fetch(`${apiUrl}/api/todos/${id}`, {
         method: "DELETE",
       })
         .then((res) => {
@@ -292,7 +289,6 @@ function TodoList() {
     }
   };
 
-  // Filter todos based on statusFilter
   const filteredTodos = todos.filter((todo) => {
     if (statusFilter === "all") return true;
     if (statusFilter === "done") return todo.status === "Done";
@@ -313,7 +309,7 @@ function TodoList() {
           type="text"
           placeholder="Search by title..."
           value={search}
-          onChange={(e) =>handleSearch(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           className="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
         />
         <select
@@ -332,7 +328,6 @@ function TodoList() {
           <option value="DESC">Newest First</option>
           <option value="ASC">Oldest First</option>
         </select>
-
         <div className="relative">
           <button
             className="p-2 rounded-full border border-gray-300 hover:bg-gray-100 transition"
@@ -343,8 +338,6 @@ function TodoList() {
           >
             <FaFilter className="text-gray-500 w-5 h-5" />
           </button>
-
-          {/* Dropdown menu */}
           {showFilterMenu && (
             <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
               <ul className="py-1">
